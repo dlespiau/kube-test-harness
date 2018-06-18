@@ -28,6 +28,8 @@ func (test *Test) CreateNamespace(name string) {
 	_, err := test.createNamespace(name)
 	test.err(err)
 
+	test.addNamespace(name)
+
 	test.addFinalizer(func() error {
 		if err := test.deleteNamespace(name); err != nil {
 			return err
@@ -38,5 +40,8 @@ func (test *Test) CreateNamespace(name string) {
 
 func (test *Test) deleteNamespace(name string) error {
 	test.Infof("deleting namespace %s", name)
+
+	test.removeNamespace(name)
+
 	return test.harness.kubeClient.Core().Namespaces().Delete(name, nil)
 }

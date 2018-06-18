@@ -2,13 +2,18 @@ package harness
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"strconv"
 	"strings"
 	"sync/atomic"
 	"testing"
+	"text/tabwriter"
 	"time"
 
 	"github.com/dlespiau/balance/e2e/harness/logger"
+	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -28,6 +33,7 @@ type Test struct {
 	t            *testing.T
 	logger       logger.Logger
 	inError      bool
+	namespaces   []string // List of namespaces created by the test
 	cleanUpFns   []finalizer
 }
 
@@ -72,15 +78,95 @@ func (t *Test) Setup() *Test {
 	return t
 }
 
+func podContainersReady(pod *v1.Pod) (numReady int, numContainers int) {
+	for _, cond := range pod.Status.Conditions {
+		if cond.Type != v1.PodReady {
+			continue
+		}
+		numContainers++
+		if cond.Status == v1.ConditionTrue {
+			numReady++
+		}
+	}
+	return numReady, numContainers
+}
+
+// XXX: Maybe a bit too simplistic to synthesize a status.
+func podStatus(pod *v1.Pod) (status, containerName string) {
+	for _, cs := range pod.Status.ContainerStatuses {
+		if state := cs.State.Waiting; state != nil {
+			return state.Reason, cs.Name
+		}
+	}
+	return "Ready", ""
+}
+
+type dumpLogs struct {
+	pod           v1.Pod
+	containerName string
+}
+
+// DumpNamespace writes to w information about the pods in a namespace.
+func (t *Test) DumpNamespace(w io.Writer, ns string) {
+	tw := tabwriter.NewWriter(w, 0, 0, 1, ' ', 0)
+
+	fmt.Fprintf(w, "\n=== pods, namespace=%s\n\n", ns)
+
+	fmt.Fprintln(tw, "NAME\t  READY\t  STATUS")
+
+	var logs []dumpLogs
+	for _, pod := range t.ListPods(ns, metav1.ListOptions{}).Items {
+		numReady, numContainers := podContainersReady(&pod)
+		status, containerName := podStatus(&pod)
+		if status != "Ready" {
+			logs = append(logs, dumpLogs{pod, containerName})
+		}
+
+		fmt.Fprintf(tw, "%s\t  %d/%d\t  %s\n",
+			pod.Name,
+			numReady, numContainers,
+			status,
+		)
+	}
+
+	tw.Flush()
+
+	for _, l := range logs {
+		fmt.Fprintf(w, "\n=== logs, pod=%s, container=%s\n\n", l.pod.Name, l.containerName)
+		if err := t.PodLogs(w, &l.pod, l.containerName); err != nil {
+			fmt.Println(err)
+
+		}
+	}
+}
+
+// DumpTestState writes to w information about the objects created by the test.
+func (t *Test) DumpTestState(w io.Writer) {
+	// kube-system is interesting because it has pods that could make tests fail
+	// (eg. kube-dns)
+	namespaces := make([]string, len(t.namespaces)+1)
+	namespaces[0] = "kube-system"
+	copy(namespaces[1:], t.namespaces)
+
+	for _, ns := range namespaces {
+		t.DumpNamespace(w, ns)
+	}
+}
+
+func (t *Test) dumpTestState() {
+	t.DumpTestState(os.Stderr)
+	fmt.Fprintln(os.Stderr)
+}
+
 // Close frees all kubernetes resources allocated during the test.
 func (t *Test) Close() {
 	// We're being called while panicking, don't cleanup!
 	if r := recover(); r != nil {
-		// XXX: Display more information about the test namespace and events.
+		t.dumpTestState()
 		panic(r)
 	}
 	if t.t.Failed() || t.inError {
-		// XXX: Display more information about the test namespace and events.
+		t.dumpTestState()
 		return
 	}
 
@@ -104,6 +190,21 @@ func (t *Test) err(err error) {
 		t.inError = true
 		t.t.Fatal(err)
 	}
+}
+
+func (t *Test) addNamespace(ns string) {
+	t.namespaces = append(t.namespaces, ns)
+}
+
+func (t *Test) removeNamespace(ns string) {
+	new := make([]string, 0, len(t.namespaces)-1)
+	for _, s := range t.namespaces {
+		if s == ns {
+			continue
+		}
+		new = append(new, s)
+	}
+	t.namespaces = new
 }
 
 func (t *Test) addFinalizer(fn finalizer) {
