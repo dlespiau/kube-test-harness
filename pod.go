@@ -3,6 +3,7 @@ package harness
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1beta2"
@@ -99,6 +100,30 @@ func firstPort(pod *v1.Pod) string {
 	}
 
 	return ""
+}
+
+// PodLogs writes the container logs on w. If the pod has a single container,
+// containerName is optional and can be set to "".
+func (test *Test) PodLogs(w io.Writer, pod *v1.Pod, containerName string) error {
+	if containerName == "" {
+		if len(pod.Spec.Containers) != 1 {
+			return fmt.Errorf("logs: no container name specified and found %d containers", len(pod.Spec.Containers))
+		}
+		containerName = pod.Spec.Containers[0].Name
+	}
+
+	logs, err := test.harness.kubeClient.Core().RESTClient().Get().
+		Resource("pods").
+		Namespace(pod.Namespace).
+		Name(pod.Name).SubResource("log").
+		Param("container", containerName).
+		Stream()
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(w, logs)
+	return err
 }
 
 // PodProxyGet returns a Request that can used to perform an HTTP GET to a pod
