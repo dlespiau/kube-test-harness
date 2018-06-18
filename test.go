@@ -19,7 +19,7 @@ type finalizer func() error
 type Test struct {
 	// ID is a unique identifier for the test, defined from the test function name.
 	ID string
-	// Namespace is name of the namespace automatically crated by Setup for the
+	// Namespace is name of the namespace automatically crafted by Setup for the
 	// test to run in.
 	Namespace string
 
