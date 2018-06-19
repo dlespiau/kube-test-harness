@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/dlespiau/balance/e2e/harness/logger"
+	"github.com/dlespiau/kube-harness/logger"
 
 	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
