@@ -1,3 +1,5 @@
+[![API Reference](https://godoc.org/github.com/dlespiau/kube-harness?status.svg)](http://godoc.org/github.com/dlespiau/kube-harness)
+
 # Kubernetes Test Harness
 
 This package implements a test harness for running integration or end to end tests in a Kubernetes cluster.
