@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/dlespiau/kube-harness.svg?branch=master)](https://travis-ci.org/dlespiau/kube-harness)
 [![API Reference](https://godoc.org/github.com/dlespiau/kube-harness?status.svg)](http://godoc.org/github.com/dlespiau/kube-harness)
 
 # Kubernetes Test Harness
