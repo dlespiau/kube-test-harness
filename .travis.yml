@@ -1,0 +1,18 @@
+sudo: required
+language: go
+go:
+  - "1.10.3"
+go_import_path: github.com/dlespiau/balance
+
+jobs:
+  include:
+      - stage: build & integrations tests
+        script:
+          - make dep
+          - make lint
+          - make unit-tests
+      - stage:
+        script:
+          - make dep
+          - .ci/setup-minikube v1.9.0
+          - make integration-tests
