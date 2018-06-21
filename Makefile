@@ -8,9 +8,12 @@ lint:
 	@.ci/go-lint
 
 unit-tests:
+	go build -i .
 	go test -v . ./logger
 
 integration-tests:
+	go build -i .
 	go test -v ./examples/simple
+	go test -v ./tests
 
 .PHONY: dep integration-tests lint unit-tests
