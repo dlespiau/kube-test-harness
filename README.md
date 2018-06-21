@@ -1,3 +1,4 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/dlespiau/kube-harness)](https://goreportcard.com/report/github.com/dlespiau/kube-harness)
 [![Build Status](https://travis-ci.org/dlespiau/kube-harness.svg?branch=master)](https://travis-ci.org/dlespiau/kube-harness)
 [![API Reference](https://godoc.org/github.com/dlespiau/kube-harness?status.svg)](http://godoc.org/github.com/dlespiau/kube-harness)
 
