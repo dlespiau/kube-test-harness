@@ -53,7 +53,8 @@ type Options struct {
 	// $HOME/.kube/config.
 	Kubeconfig string
 	// ManifestDirectory is the root directory where the test Kubernetes manifests
-	// are located. If not given, defaults to the current working directory.
+	// are located. It can be an absolute path a or path relative to the directory
+	// where the test is. If not given, defaults to the current working directory.
 	ManifestDirectory string
 	// NoCleanup controls if tests should cleanup after them.
 	NoCleanup bool
@@ -85,8 +86,27 @@ func New(options Options) *Harness {
 	}
 }
 
+func resolveDirectory(in string) (string, error) {
+	if filepath.IsAbs(in) {
+		return in, nil
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", errors.Wrap(err, "harness")
+	}
+
+	if in == "" {
+		return cwd, nil
+	}
+
+	return filepath.Join(cwd, in), nil
+}
+
 // Setup initializes the test harness.
 func (h *Harness) Setup() error {
+	var err error
+
 	// Logging
 	if h.options.Logger == nil {
 		h.options.Logger = &logger.TestLogger{}
@@ -97,12 +117,9 @@ func (h *Harness) Setup() error {
 	h.options.Logger.SetLevel(h.options.LogLevel)
 
 	// Directories
-	if h.options.ManifestDirectory == "" {
-		cwd, err := os.Getwd()
-		if err != nil {
-			return errors.Wrap(err, "harness")
-		}
-		h.options.ManifestDirectory = cwd
+	h.options.ManifestDirectory, err = resolveDirectory(h.options.ManifestDirectory)
+	if err != nil {
+		return err
 	}
 
 	// Kubernetes client
