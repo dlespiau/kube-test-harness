@@ -12,10 +12,10 @@ Features:
 - Full access to the client-go API to manipulate Kubernetes objects.
 - Wait for various readiness conditions.
 - Each test runs in its own namespace, allowing them to run in parallel.
-- Display a detailed error state to help the developer debug failure cases with the pod status, events and logs of failing pods.
+- Display a detailed error state to help the developer debug failure cases with pod status, events and logs of failing pods.
 - Automatic error checking, no need to check `err` at every line!
 
-## Example
+## Writing a Test
 
 [`example/simple`](https://github.com/dlespiau/kube-harness/tree/master/examples/simple) has a self-contained example that shows how to write a test with `kube-harness`:
 
