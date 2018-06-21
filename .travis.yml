@@ -2,7 +2,7 @@ sudo: required
 language: go
 go:
   - "1.10.3"
-go_import_path: github.com/dlespiau/balance
+go_import_path: github.com/dlespiau/kube-harness
 
 jobs:
   include:
