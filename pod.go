@@ -44,7 +44,7 @@ func (test *Test) ListPodsFromDeployment(d *appsv1.Deployment) *v1.PodList {
 
 // PodReady returns whether a pod is running and each container has is in the
 // ready state.
-func PodReady(pod v1.Pod) (bool, error) {
+func (test *Test) PodReady(pod v1.Pod) (bool, error) {
 	switch pod.Status.Phase {
 	case v1.PodFailed, v1.PodSucceeded:
 		return false, fmt.Errorf("pod completed")
@@ -71,7 +71,7 @@ func (test *Test) WaitForPodsReady(namespace string, opts metav1.ListOptions, ex
 
 		runningAndReady := 0
 		for _, p := range pl.Items {
-			isRunningAndReady, err := PodReady(p)
+			isRunningAndReady, err := test.PodReady(p)
 			if err != nil {
 				return false, err
 			}
