@@ -2,9 +2,13 @@ package harness
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
+
 	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
@@ -73,4 +77,31 @@ func (test *Test) deleteSecret(secret *v1.Secret) error {
 func (test *Test) DeleteSecret(secret *v1.Secret) {
 	err := test.deleteSecret(secret)
 	test.err(err)
+}
+
+// GetSecret returns a Secret object if it exists or error.
+func (test *Test) GetSecret(ns, name string) (*v1.Secret, error) {
+	s, err := test.harness.kubeClient.CoreV1().Secrets(ns).Get(name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return s, nil
+}
+
+// WaitForSecretReady waits until Secret is created, otherwise times out.
+func (test *Test) WaitForSecretReady(secret *v1.Secret, timeout time.Duration) {
+	err := test.waitForSecretReady(secret.Namespace, secret.Name, timeout)
+	test.err(err)
+}
+
+func (test *Test) waitForSecretReady(ns, name string, timeout time.Duration) error {
+	return wait.Poll(time.Second, timeout, func() (bool, error) {
+		_, err := test.GetSecret(ns, name)
+		if err != nil {
+			return false, err
+		}
+
+		return true, nil
+	})
 }
