@@ -2,9 +2,13 @@ package harness
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
+
 	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
@@ -73,4 +77,31 @@ func (test *Test) deleteConfigMap(ConfigMap *v1.ConfigMap) error {
 func (test *Test) DeleteConfigMap(ConfigMap *v1.ConfigMap) {
 	err := test.deleteConfigMap(ConfigMap)
 	test.err(err)
+}
+
+// GetConfigMap returns a ConfigMap object if it exists or error.
+func (test *Test) GetConfigMap(ns, name string) (*v1.ConfigMap, error) {
+	cm, err := test.harness.kubeClient.CoreV1().ConfigMaps(ns).Get(name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return cm, nil
+}
+
+// WaitForConfigMapReady waits until ConfigMap is created, otherwise times out.
+func (test *Test) WaitForConfigMapReady(cm *v1.ConfigMap, timeout time.Duration) {
+	err := test.waitForConfigMapReady(cm.Namespace, cm.Name, timeout)
+	test.err(err)
+}
+
+func (test *Test) waitForConfigMapReady(ns, name string, timeout time.Duration) error {
+	return wait.Poll(time.Second, timeout, func() (bool, error) {
+		_, err := test.GetConfigMap(ns, name)
+		if err != nil {
+			return false, err
+		}
+
+		return true, nil
+	})
 }
