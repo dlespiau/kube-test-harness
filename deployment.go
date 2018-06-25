@@ -68,6 +68,16 @@ func (test *Test) CreateDeploymentFromFile(namespace string, manifestPath string
 	return d
 }
 
+// GetDeployment returns Deployment if it exists or error if it doesn't.
+func (test *Test) GetDeployment(ns, name string) (*appsv1.Deployment, error) {
+	d, err := test.harness.kubeClient.AppsV1beta2().Deployments(ns).Get(name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return d, nil
+}
+
 // waitForDeploymentReady waits until all replica pods are running and ready.
 func (test *Test) waitForDeploymentReady(d *appsv1.Deployment, timeout time.Duration) error {
 	numReady := int32(0)
@@ -75,9 +85,7 @@ func (test *Test) waitForDeploymentReady(d *appsv1.Deployment, timeout time.Dura
 	test.Infof("waiting for deployment %s to be ready", d.Name)
 
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
-		current, err := test.harness.kubeClient.
-			AppsV1beta2().Deployments(d.Namespace).
-			Get(d.Name, metav1.GetOptions{})
+		current, err := test.GetDeployment(d.Namespace, d.Name)
 		if err != nil {
 			return false, err
 		}
@@ -104,7 +112,7 @@ func (test *Test) WaitForDeploymentReady(d *appsv1.Deployment, timeout time.Dura
 func (test *Test) deleteDeployment(d *appsv1.Deployment) error {
 	test.Infof("deleting deployment %s ", d.Name)
 
-	d, err := test.harness.kubeClient.AppsV1beta2().Deployments(d.Namespace).Get(d.Name, metav1.GetOptions{})
+	d, err := test.GetDeployment(d.Namespace, d.Name)
 	if err != nil {
 		return err
 	}
@@ -129,10 +137,8 @@ func (test *Test) waitForDeploymentDeleted(d *appsv1.Deployment, timeout time.Du
 	test.Infof("waiting for deployment %s to be deleted", d.Name)
 
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
-		_, err := test.harness.kubeClient.
-			AppsV1beta2().Deployments(d.Namespace).
-			Get(d.Name, metav1.GetOptions{})
 
+		_, err := test.GetDeployment(d.Namespace, d.Name)
 		if err != nil {
 			if apierrors.IsNotFound(err) {
 				return true, nil
