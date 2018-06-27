@@ -52,7 +52,7 @@ func (test *Test) createSecretFromFile(namespace string, manifestPath string) (*
 	if err != nil {
 		return nil, err
 	}
-	err = test.createSecret(test.Namespace, s)
+	err = test.createSecret(namespace, s)
 	if err != nil {
 		return nil, err
 	}
