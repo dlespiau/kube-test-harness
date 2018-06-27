@@ -54,7 +54,7 @@ func (test *Test) createDeploymentFromFile(namespace string, manifestPath string
 	if err != nil {
 		return nil, err
 	}
-	err = test.createDeployment(test.Namespace, d)
+	err = test.createDeployment(namespace, d)
 	if err != nil {
 		return nil, err
 	}

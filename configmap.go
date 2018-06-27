@@ -52,7 +52,7 @@ func (test *Test) createConfigMapFromFile(namespace string, manifestPath string)
 	if err != nil {
 		return nil, err
 	}
-	err = test.createConfigMap(test.Namespace, s)
+	err = test.createConfigMap(namespace, s)
 	if err != nil {
 		return nil, err
 	}

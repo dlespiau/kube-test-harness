@@ -51,7 +51,7 @@ func (test *Test) createServiceFromFile(namespace string, manifestPath string) (
 	if err != nil {
 		return nil, err
 	}
-	err = test.createService(test.Namespace, s)
+	err = test.createService(namespace, s)
 	if err != nil {
 		return nil, err
 	}
