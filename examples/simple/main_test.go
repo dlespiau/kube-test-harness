@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/dlespiau/kube-harness"
+	"github.com/dlespiau/kube-test-harness"
 )
 
 var kube *harness.Harness

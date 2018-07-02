@@ -1,6 +1,6 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/dlespiau/kube-harness)](https://goreportcard.com/report/github.com/dlespiau/kube-harness)
-[![Build Status](https://travis-ci.org/dlespiau/kube-harness.svg?branch=master)](https://travis-ci.org/dlespiau/kube-harness)
-[![API Reference](https://godoc.org/github.com/dlespiau/kube-harness?status.svg)](http://godoc.org/github.com/dlespiau/kube-harness)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dlespiau/kube-test-harness)](https://goreportcard.com/report/github.com/dlespiau/kube-test-harness)
+[![Build Status](https://travis-ci.org/dlespiau/kube-test-harness.svg?branch=master)](https://travis-ci.org/dlespiau/kube-test-harness)
+[![API Reference](https://godoc.org/github.com/dlespiau/kube-test-harness?status.svg)](http://godoc.org/github.com/dlespiau/kube-test-harness)
 
 # Kubernetes Test Harness
 
@@ -18,7 +18,7 @@ Features:
 
 ## Writing a Test
 
-[`example/simple`](https://github.com/dlespiau/kube-harness/tree/master/examples/simple) has a self-contained example that shows how to write a test with `kube-harness`:
+[`example/simple`](https://github.com/dlespiau/kube-test-harness/tree/master/examples/simple) has a self-contained example that shows how to write a test with `kube-test-harness`:
 
 ```go
 // TestDeployNginx deploys nginx on a kubernetes cluster and tests it's running
@@ -52,7 +52,7 @@ func TestDeployNginx(t *testing.T) {
 }
 ```
 
-To run `kube-harness` tests a Kubernetes cluster is needed. It's then a `go test` invocation away:
+To run `kube-test-harness` tests a Kubernetes cluster is needed. It's then a `go test` invocation away:
 
 ```console
 $ go test -v ./examples/simple/`
@@ -64,12 +64,12 @@ $ go test -v ./examples/simple/`
     deployment.go:75: waiting for deployment nginx to be ready
     namespace.go:42: deleting namespace deploy-nginx-1529445457-ns-1
 PASS
-ok      github.com/dlespiau/kube-harness/examples/simple    3.090s
+ok      github.com/dlespiau/kube-test-harness/examples/simple    3.090s
 ```
 
 ## Error State
 
-When a test fails, `kube-harness` will display the state of the cluster to help the developer debug the problem. As an example, I changed the Nginx manifest in [`example/simple`](https://github.com/dlespiau/kube-harness/tree/master/examples/simple) to have an invalid image name. Running the test displayed clues about what the problem was:
+When a test fails, `kube-test-harness` will display the state of the cluster to help the developer debug the problem. As an example, I changed the Nginx manifest in [`example/simple`](https://github.com/dlespiau/kube-test-harness/tree/master/examples/simple) to have an invalid image name. Running the test displayed clues about what the problem was:
 
 ```console
 $ go test -v ./examples/simple/
@@ -104,5 +104,5 @@ container "nginx" in pod "nginx-75f7677558-x4wdv" is waiting to start: trying an
     deployment.go:75: waiting for deployment nginx to be ready
     test.go:191: timed out waiting for the condition
 FAIL
-FAIL    github.com/dlespiau/kube-harness/examples/simple    30.121s
+FAIL    github.com/dlespiau/kube-test-harness/examples/simple    30.121s
 ```

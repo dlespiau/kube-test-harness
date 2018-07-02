@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/dlespiau/kube-harness/logger"
+	"github.com/dlespiau/kube-test-harness/logger"
 
 	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
