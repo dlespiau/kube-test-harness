@@ -16,6 +16,7 @@ const (
 type Logger interface {
 	ForTest(t *testing.T) Logger
 	SetLevel(level LogLevel)
+	GetLevel() LogLevel
 	Log(level LogLevel, msg string)
 	Logf(level LogLevel, fmt string, args ...interface{})
 }
