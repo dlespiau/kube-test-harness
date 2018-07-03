@@ -122,6 +122,15 @@ func (h *Harness) Setup() error {
 		return err
 	}
 
+	return h.SetKubeconfig("")
+}
+
+// SetKubeconfig reconfigures harness with the given kubeconfig file. Using ""
+// as the new path makes harness fallback to the default kubeconfig location on
+// your system.
+func (h *Harness) SetKubeconfig(kubeconfigPath string) error {
+	h.options.Kubeconfig = kubeconfigPath
+
 	// Kubernetes client
 	config, err := newClientConfig(h.options.Kubeconfig)
 	if err != nil {
