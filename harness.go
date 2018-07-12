@@ -108,6 +108,12 @@ func (h *Harness) Setup() error {
 	return h.SetKubeconfig("")
 }
 
+// KubeClient returns the underlying Kubernetes client hat be used to access the
+// Kubernetes API directly.
+func (h *Harness) KubeClient() kubernetes.Interface {
+	return h.kubeClient
+}
+
 // defaultKubeconfigPath returns the kubeconfig location.
 func defaultKubeconfigPath() string {
 	if env := os.Getenv("KUBECONFIG"); env != "" {
