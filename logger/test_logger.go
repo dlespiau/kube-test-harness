@@ -26,8 +26,13 @@ func (l *TestLogger) Log(level LogLevel, msg string) {
 	if !l.shouldLog(level) {
 		return
 	}
-	l.t.Helper()
-	l.t.Log(msg)
+	if l.t != nil {
+		l.t.Helper()
+		l.t.Log(msg)
+		return
+	}
+	pl := PrintfLogger{}
+	pl.Log(level, msg)
 }
 
 // Logf implements Logger.
@@ -35,6 +40,11 @@ func (l *TestLogger) Logf(level LogLevel, f string, args ...interface{}) {
 	if !l.shouldLog(level) {
 		return
 	}
-	l.t.Helper()
-	l.t.Logf(f, args...)
+	if l.t != nil {
+		l.t.Helper()
+		l.t.Logf(f, args...)
+		return
+	}
+	pl := PrintfLogger{}
+	pl.Logf(level, f, args...)
 }
