@@ -105,7 +105,11 @@ func (h *Harness) Setup() error {
 		return err
 	}
 
-	return h.SetKubeconfig("")
+	// It's possible we don't have a kubeconfig file at Setup time. We hope someone
+	// will call SetKubeconfig at a later point when the location of kubeconfig is
+	// known.
+	h.SetKubeconfig("")
+	return nil
 }
 
 // KubeClient returns the underlying Kubernetes client hat be used to access the
