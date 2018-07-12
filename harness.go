@@ -164,14 +164,14 @@ func (h *Harness) openManifest(manifest string) (*os.File, error) {
 // Run setup the test harness and run the tests with m.Run.
 func (h *Harness) Run(m *testing.M) int {
 	if err := h.Setup(); err != nil {
-		h.options.Logger.Logf(logger.Info, "failed to initialize test harness: %v\n", err)
+		h.options.Logger.Logf(logger.Info, "failed to initialize test harness: %v", err)
 		return 1
 	}
 
 	code := m.Run()
 
 	if err := h.Close(); err != nil {
-		h.options.Logger.Logf(logger.Info, "failed to teardown test harness: %v\n", err)
+		h.options.Logger.Logf(logger.Info, "failed to teardown test harness: %v", err)
 		code = 1
 	}
 
