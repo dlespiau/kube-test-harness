@@ -20,26 +20,9 @@ func homeDirectory() string {
 	return os.Getenv("USERPROFILE") // windows
 }
 
-// kubeconfigPath returns the kubeconfig location.
-func kubeconfigPath() string {
-	if env := os.Getenv("KUBECONFIG"); env != "" {
-		return env
-	}
-
-	home := homeDirectory()
-	if home == "" {
-		return ""
-	}
-	return filepath.Join(home, ".kube", "config")
-}
-
 // newClientConfig returns a configuration object that can be used to configure
 // a client in order to contact an API server with.
 func newClientConfig(kubeconfig string) (*rest.Config, error) {
-	if kubeconfig == "" {
-		kubeconfig = kubeconfigPath()
-	}
-
 	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfig},
 		&clientcmd.ConfigOverrides{},
@@ -125,10 +108,28 @@ func (h *Harness) Setup() error {
 	return h.SetKubeconfig("")
 }
 
+// defaultKubeconfigPath returns the kubeconfig location.
+func defaultKubeconfigPath() string {
+	if env := os.Getenv("KUBECONFIG"); env != "" {
+		return env
+	}
+
+	home := homeDirectory()
+	if home == "" {
+		return ""
+	}
+	return filepath.Join(home, ".kube", "config")
+}
+
 // SetKubeconfig reconfigures harness with the given kubeconfig file. Using ""
 // as the new path makes harness fallback to the default kubeconfig location on
 // your system.
 func (h *Harness) SetKubeconfig(kubeconfigPath string) error {
+	if kubeconfigPath == "" {
+		kubeconfigPath = defaultKubeconfigPath()
+	}
+
+	h.options.Logger.Logf(logger.Info, "using kubeconfig: %s", kubeconfigPath)
 	h.options.Kubeconfig = kubeconfigPath
 
 	// Kubernetes client
@@ -163,14 +164,14 @@ func (h *Harness) openManifest(manifest string) (*os.File, error) {
 // Run setup the test harness and run the tests with m.Run.
 func (h *Harness) Run(m *testing.M) int {
 	if err := h.Setup(); err != nil {
-		h.options.Logger.Logf(logger.Info, "failed to initialize test harness: %v\n", err)
+		h.options.Logger.Logf(logger.Info, "failed to initialize test harness: %v", err)
 		return 1
 	}
 
 	code := m.Run()
 
 	if err := h.Close(); err != nil {
-		h.options.Logger.Logf(logger.Info, "failed to teardown test harness: %v\n", err)
+		h.options.Logger.Logf(logger.Info, "failed to teardown test harness: %v", err)
 		code = 1
 	}
 
