@@ -139,7 +139,6 @@ func (h *Harness) SetKubeconfig(kubeconfigPath string) error {
 		kubeconfigPath = defaultKubeconfigPath()
 	}
 
-	h.options.Logger.Logf(logger.Info, "using kubeconfig: %s", kubeconfigPath)
 	h.options.Kubeconfig = kubeconfigPath
 
 	// Kubernetes client
@@ -152,6 +151,8 @@ func (h *Harness) SetKubeconfig(kubeconfigPath string) error {
 		return err
 	}
 	h.apiServer = config.Host
+
+	h.options.Logger.Logf(logger.Info, "using kubeconfig: %s", kubeconfigPath)
 
 	return nil
 }
