@@ -55,7 +55,7 @@ func TestDeployNginx(t *testing.T) {
 To run `kube-test-harness` tests a Kubernetes cluster is needed. It's then a `go test` invocation away:
 
 ```console
-$ go test -v ./examples/simple/`
+$ go test -v ./examples/simple/
 === RUN   TestDeployNginx
 --- PASS: TestDeployNginx (3.08s)
     test.go:63: using API server https://192.168.99.116:8443
