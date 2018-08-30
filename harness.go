@@ -3,9 +3,9 @@ package harness
 import (
 	"os"
 	"path/filepath"
-	"testing"
 
 	"github.com/dlespiau/kube-test-harness/logger"
+	"github.com/dlespiau/kube-test-harness/testing"
 
 	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"

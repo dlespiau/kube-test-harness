@@ -1,6 +1,6 @@
 package logger
 
-import "testing"
+import "github.com/dlespiau/kube-test-harness/testing"
 
 // LogLevel defines how verbose the Logger is.
 type LogLevel int
@@ -14,7 +14,7 @@ const (
 
 // Logger can output logs when running tests.
 type Logger interface {
-	ForTest(t *testing.T) Logger
+	ForTest(t testing.T) Logger
 	SetLevel(level LogLevel)
 	GetLevel() LogLevel
 	Log(level LogLevel, msg string)
