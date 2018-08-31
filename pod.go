@@ -88,20 +88,6 @@ func (test *Test) WaitForPodsReady(namespace string, opts metav1.ListOptions, ex
 	})
 }
 
-func firstPort(pod *v1.Pod) string {
-	for i := range pod.Spec.Containers {
-		container := &pod.Spec.Containers[i]
-
-		if len(container.Ports) == 0 {
-			continue
-		}
-
-		return fmt.Sprintf("%d", container.Ports[0].ContainerPort)
-	}
-
-	return ""
-}
-
 // PodLogs writes the container logs on w. If the pod has a single container,
 // containerName is optional and can be set to "".
 func (test *Test) PodLogs(w io.Writer, pod *v1.Pod, containerName string) error {
@@ -131,8 +117,9 @@ func (test *Test) PodLogs(w io.Writer, pod *v1.Pod, containerName string) error 
 //
 // If port is "", the first port found in the containers spec will be used.
 func (test *Test) PodProxyGet(pod *v1.Pod, port, path string) *rest.Request {
+	name := pod.Name
 	if port == "" {
-		port = firstPort(pod)
+		name += ":" + port
 	}
 
 	return test.harness.kubeClient.
@@ -141,7 +128,7 @@ func (test *Test) PodProxyGet(pod *v1.Pod, port, path string) *rest.Request {
 		Get().
 		Namespace(pod.Namespace).
 		Resource("pods").
-		Name(pod.Name + ":" + port).
+		Name(name).
 		Suffix("proxy" + path)
 }
 
