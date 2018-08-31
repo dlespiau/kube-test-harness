@@ -139,11 +139,10 @@ func (test *Test) PodProxyGet(pod *v1.Pod, port, path string) *rest.Request {
 		CoreV1().
 		RESTClient().
 		Get().
-		Prefix("proxy").
 		Namespace(pod.Namespace).
 		Resource("pods").
 		Name(pod.Name + ":" + port).
-		Suffix(path)
+		Suffix("proxy" + path)
 }
 
 func (test *Test) podProxyGetJSON(pod *v1.Pod, port, path string, v interface{}) error {
