@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
-	"testing"
+
+	"github.com/dlespiau/kube-test-harness/testing"
 )
 
 // PrintfLogger is a logger using testing.T.Log for its output.
@@ -16,7 +17,7 @@ type PrintfLogger struct {
 var _ Logger = &PrintfLogger{}
 
 // ForTest implements Logger.
-func (l *PrintfLogger) ForTest(t *testing.T) Logger {
+func (l *PrintfLogger) ForTest(t testing.T) Logger {
 	return l
 }
 

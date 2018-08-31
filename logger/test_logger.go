@@ -1,8 +1,6 @@
 package logger
 
-import (
-	"testing"
-)
+import "github.com/dlespiau/kube-test-harness/testing"
 
 // TestLogger is a logger using testing.T.Log for its output.
 type TestLogger struct {
@@ -12,7 +10,7 @@ type TestLogger struct {
 var _ Logger = &TestLogger{}
 
 // ForTest implements Logger.
-func (l *TestLogger) ForTest(t *testing.T) Logger {
+func (l *TestLogger) ForTest(t testing.T) Logger {
 	return &TestLogger{
 		baseLogger: baseLogger{
 			level: l.level,

@@ -3,16 +3,16 @@ package harness
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strconv"
 	"strings"
 	"sync/atomic"
-	"testing"
 	"text/tabwriter"
 	"time"
 
 	"github.com/dlespiau/kube-test-harness/logger"
+	"github.com/dlespiau/kube-test-harness/testing"
+
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -31,38 +31,24 @@ type Test struct {
 
 	nextObjectID uint64
 	harness      *Harness
-	t            *testing.T
+	t            testing.T
 	logger       logger.Logger
 	inError      bool
 	namespaces   []string // List of namespaces created by the test
 	cleanUpFns   []finalizer
 }
 
-func testName(t *testing.T) string {
-	if t != nil {
-		return t.Name()
-	}
-	return "undefined-test"
-}
-
-func testLogger(l logger.Logger, t *testing.T) logger.Logger {
-	if t != nil {
-		return l.ForTest(t)
-	}
-
-	// We don't have a *testing.T to use, fallback to printf!
-	newLogger := &logger.PrintfLogger{}
-	newLogger.SetLevel(l.GetLevel())
-	return newLogger
+func testLogger(l logger.Logger, t testing.T) logger.Logger {
+	return l.ForTest(t)
 }
 
 // NewTest creates a new test. Call Close() to free kubernetes resources
 // allocated during the test.
-func (h *Harness) NewTest(t *testing.T) *Test {
+func (h *Harness) NewTest(t testing.T) *Test {
 	// TestCtx is used among others for namespace names where '/' is forbidden
 	prefix := strings.TrimPrefix(
 		strings.Replace(
-			testName(t),
+			t.Name(),
 			"/",
 			"-",
 			-1,
@@ -178,11 +164,7 @@ func (t *Test) dumpTestState() {
 }
 
 func (t *Test) fatal(args ...interface{}) {
-	if t.t != nil {
-		t.t.Fatal(args...)
-		return
-	}
-	log.Fatal(args...)
+	t.t.Fatal(args...)
 }
 
 // Close frees all kubernetes resources allocated during the test.
@@ -192,7 +174,7 @@ func (t *Test) Close() {
 		t.dumpTestState()
 		panic(r)
 	}
-	if (t.t != nil && t.t.Failed()) || t.inError {
+	if (t.t.Failed()) || t.inError {
 		t.dumpTestState()
 		return
 	}
@@ -240,32 +222,24 @@ func (t *Test) addFinalizer(fn finalizer) {
 
 // Debug prints a debug message.
 func (t *Test) Debug(msg string) {
-	if t.t != nil {
-		t.t.Helper()
-	}
+	t.t.Helper()
 	t.logger.Logf(logger.Debug, msg)
 }
 
 // Debugf prints a debug message with a format string.
 func (t *Test) Debugf(f string, args ...interface{}) {
-	if t.t != nil {
-		t.t.Helper()
-	}
+	t.t.Helper()
 	t.logger.Logf(logger.Debug, f, args...)
 }
 
 // Info prints an informational message.
 func (t *Test) Info(msg string) {
-	if t.t != nil {
-		t.t.Helper()
-	}
+	t.t.Helper()
 	t.logger.Log(logger.Info, msg)
 }
 
 // Infof prints a informational message with a format string.
 func (t *Test) Infof(f string, args ...interface{}) {
-	if t.t != nil {
-		t.t.Helper()
-	}
+	t.t.Helper()
 	t.logger.Logf(logger.Info, f, args...)
 }
