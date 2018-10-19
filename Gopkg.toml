@@ -31,8 +31,13 @@
 
 [[constraint]]
   name = "k8s.io/client-go"
-  version = "v7.0.0"
+  version = "v8.0.0"
 
 [[constraint]]
   name = "k8s.io/apimachinery"
-  branch = "release-1.10"
+  branch = "release-1.11"
+
+[[override]]
+  # https://github.com/kubernetes/apimachinery/blob/release-1.11/Godeps/Godeps.json#L93-L96 
+  name = "github.com/json-iterator/go"
+  revision = "f2b4162afba35581b6d4a50d3b8f34e33c144682"
