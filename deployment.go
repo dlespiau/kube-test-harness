@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	appsv1 "k8s.io/api/apps/v1beta2"
+	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -15,7 +15,7 @@ import (
 func (test *Test) createDeployment(namespace string, d *appsv1.Deployment) error {
 	test.Infof("creating deployment %s", d.Name)
 	d.Namespace = namespace
-	_, err := test.harness.kubeClient.AppsV1beta2().Deployments(namespace).Create(d)
+	_, err := test.harness.kubeClient.AppsV1().Deployments(namespace).Create(d)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create deployment %s", d.Name)
 	}
@@ -70,7 +70,7 @@ func (test *Test) CreateDeploymentFromFile(namespace string, manifestPath string
 
 // GetDeployment returns Deployment if it exists or error if it doesn't.
 func (test *Test) GetDeployment(ns, name string) (*appsv1.Deployment, error) {
-	d, err := test.harness.kubeClient.AppsV1beta2().Deployments(ns).Get(name, metav1.GetOptions{})
+	d, err := test.harness.kubeClient.AppsV1().Deployments(ns).Get(name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -120,11 +120,11 @@ func (test *Test) deleteDeployment(d *appsv1.Deployment) error {
 	zero := int32(0)
 	d.Spec.Replicas = &zero
 
-	d, err = test.harness.kubeClient.AppsV1beta2().Deployments(d.Namespace).Update(d)
+	d, err = test.harness.kubeClient.AppsV1().Deployments(d.Namespace).Update(d)
 	if err != nil {
 		return err
 	}
-	return test.harness.kubeClient.AppsV1beta2().Deployments(d.Namespace).Delete(d.Name, &metav1.DeleteOptions{})
+	return test.harness.kubeClient.AppsV1().Deployments(d.Namespace).Delete(d.Name, &metav1.DeleteOptions{})
 }
 
 // DeleteDeployment deletes a deployment in the given namespace.
