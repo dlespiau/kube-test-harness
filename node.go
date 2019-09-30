@@ -10,7 +10,7 @@ import (
 )
 
 func (test *Test) listNodes(options metav1.ListOptions) (*v1.NodeList, error) {
-	return test.harness.kubeClient.Core().Nodes().List(options)
+	return test.harness.kubeClient.CoreV1().Nodes().List(options)
 }
 
 // ListNodes returns all nodes that are part of the cluster.

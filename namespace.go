@@ -11,7 +11,7 @@ import (
 func (test *Test) createNamespace(name string) (*v1.Namespace, error) {
 	test.Infof("creating namespace %s", name)
 
-	namespace, err := test.harness.kubeClient.Core().Namespaces().Create(&v1.Namespace{
+	namespace, err := test.harness.kubeClient.CoreV1().Namespaces().Create(&v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
@@ -43,5 +43,5 @@ func (test *Test) deleteNamespace(name string) error {
 
 	test.removeNamespace(name)
 
-	return test.harness.kubeClient.Core().Namespaces().Delete(name, nil)
+	return test.harness.kubeClient.CoreV1().Namespaces().Delete(name, nil)
 }

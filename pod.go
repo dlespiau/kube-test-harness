@@ -14,7 +14,7 @@ import (
 )
 
 func (test *Test) listPods(namespace string, options metav1.ListOptions) (*v1.PodList, error) {
-	return test.harness.kubeClient.Core().Pods(namespace).List(options)
+	return test.harness.kubeClient.CoreV1().Pods(namespace).List(options)
 }
 
 // ListPods returns the list of pods in namespace matching options.
@@ -64,7 +64,7 @@ func (test *Test) PodReady(pod v1.Pod) (bool, error) {
 // container to pass its readiness check.
 func (test *Test) WaitForPodsReady(namespace string, opts metav1.ListOptions, expectedReplicas int, timeout time.Duration) error {
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
-		pl, err := test.harness.kubeClient.Core().Pods(namespace).List(opts)
+		pl, err := test.harness.kubeClient.CoreV1().Pods(namespace).List(opts)
 		if err != nil {
 			return false, err
 		}
@@ -98,7 +98,7 @@ func (test *Test) PodLogs(w io.Writer, pod *v1.Pod, containerName string) error 
 		containerName = pod.Spec.Containers[0].Name
 	}
 
-	logs, err := test.harness.kubeClient.Core().RESTClient().Get().
+	logs, err := test.harness.kubeClient.CoreV1().RESTClient().Get().
 		Resource("pods").
 		Namespace(pod.Namespace).
 		Name(pod.Name).SubResource("log").
