@@ -1,9 +1,5 @@
 all:
 
-dep:
-	go get -u github.com/golang/dep/cmd/dep
-	dep ensure
-
 lint:
 	@.ci/go-lint
 
@@ -16,4 +12,4 @@ integration-tests:
 	go test -v ./examples/...
 	go test -v ./tests
 
-.PHONY: dep integration-tests lint unit-tests
+.PHONY: integration-tests lint unit-tests
