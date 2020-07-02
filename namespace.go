@@ -1,21 +1,22 @@
 package harness
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/pkg/errors"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (test *Test) createNamespace(name string) (*v1.Namespace, error) {
 	test.Infof("creating namespace %s", name)
 
-	namespace, err := test.harness.kubeClient.CoreV1().Namespaces().Create(&v1.Namespace{
+	namespace, err := test.harness.kubeClient.CoreV1().Namespaces().Create(context.TODO(), &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
-	})
+	}, metav1.CreateOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to create namespace with name %v", name))
 	}
@@ -43,5 +44,5 @@ func (test *Test) deleteNamespace(name string) error {
 
 	test.removeNamespace(name)
 
-	return test.harness.kubeClient.CoreV1().Namespaces().Delete(name, nil)
+	return test.harness.kubeClient.CoreV1().Namespaces().Delete(context.TODO(), name, metav1.DeleteOptions{})
 }

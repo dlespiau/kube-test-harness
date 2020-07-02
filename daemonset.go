@@ -1,6 +1,7 @@
 package harness
 
 import (
+	"context"
 	"time"
 
 	"github.com/pkg/errors"
@@ -15,7 +16,7 @@ import (
 func (test *Test) createDaemonSet(namespace string, d *appsv1.DaemonSet) error {
 	test.Infof("creating daemonset %s", d.Name)
 	d.Namespace = namespace
-	_, err := test.harness.kubeClient.AppsV1().DaemonSets(namespace).Create(d)
+	_, err := test.harness.kubeClient.AppsV1().DaemonSets(namespace).Create(context.TODO(), d, metav1.CreateOptions{})
 	if err != nil {
 		return errors.Wrapf(err, "failed to create daemonset %s", d.Name)
 	}
@@ -70,7 +71,7 @@ func (test *Test) CreateDaemonSetFromFile(namespace string, manifestPath string)
 
 // GetDaemonSet returns daemonset if it exists or error if it doesn't.
 func (test *Test) GetDaemonSet(ns, name string) (*appsv1.DaemonSet, error) {
-	d, err := test.harness.kubeClient.AppsV1().DaemonSets(ns).Get(name, metav1.GetOptions{})
+	d, err := test.harness.kubeClient.AppsV1().DaemonSets(ns).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +113,7 @@ func (test *Test) deleteDaemonSet(d *appsv1.DaemonSet) error {
 		return err
 	}
 
-	return test.harness.kubeClient.AppsV1().DaemonSets(d.Namespace).Delete(d.Name, &metav1.DeleteOptions{})
+	return test.harness.kubeClient.AppsV1().DaemonSets(d.Namespace).Delete(context.TODO(), d.Name, metav1.DeleteOptions{})
 }
 
 // DeleteDaemonSet deletes a daemonset in the given namespace.

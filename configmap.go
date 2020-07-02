@@ -1,12 +1,13 @@
 package harness
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
@@ -14,7 +15,7 @@ import (
 
 func (test *Test) createConfigMap(namespace string, cm *v1.ConfigMap) error {
 	cm.Namespace = namespace
-	if _, err := test.harness.kubeClient.CoreV1().ConfigMaps(namespace).Create(cm); err != nil {
+	if _, err := test.harness.kubeClient.CoreV1().ConfigMaps(namespace).Create(context.TODO(), cm, metav1.CreateOptions{}); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("failed to create ConfigMap %v ", cm.Name))
 	}
 	return nil
@@ -67,7 +68,7 @@ func (test *Test) CreateConfigMapFromFile(namespace string, manifestPath string)
 }
 
 func (test *Test) deleteConfigMap(ConfigMap *v1.ConfigMap) error {
-	if err := test.harness.kubeClient.CoreV1().ConfigMaps(ConfigMap.Namespace).Delete(ConfigMap.Name, nil); err != nil {
+	if err := test.harness.kubeClient.CoreV1().ConfigMaps(ConfigMap.Namespace).Delete(context.TODO(), ConfigMap.Name, metav1.DeleteOptions{}); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("deleting ConfigMap %v failed", ConfigMap.Name))
 	}
 	return nil
@@ -81,7 +82,7 @@ func (test *Test) DeleteConfigMap(ConfigMap *v1.ConfigMap) {
 
 // GetConfigMap returns a ConfigMap object if it exists or error.
 func (test *Test) GetConfigMap(ns, name string) (*v1.ConfigMap, error) {
-	cm, err := test.harness.kubeClient.CoreV1().ConfigMaps(ns).Get(name, metav1.GetOptions{})
+	cm, err := test.harness.kubeClient.CoreV1().ConfigMaps(ns).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
