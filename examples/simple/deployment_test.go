@@ -1,6 +1,7 @@
 package simple
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -58,7 +59,7 @@ func TestDeployNginx(t *testing.T) {
 	// For each pod of the Deployment, check we receive a sensible response to a
 	// GET request on /.
 	for _, pod := range test.ListPodsFromDeployment(d).Items {
-		data, err := test.PodProxyGet(&pod, "80", "/").DoRaw()
+		data, err := test.PodProxyGet(&pod, "80", "/").DoRaw(context.TODO())
 		assert.NoError(t, err)
 		assert.Equal(t, index, string(data))
 	}

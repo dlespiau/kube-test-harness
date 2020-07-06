@@ -1,20 +1,21 @@
 package harness
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 )
 
 func (test *Test) listPods(namespace string, options metav1.ListOptions) (*v1.PodList, error) {
-	return test.harness.kubeClient.CoreV1().Pods(namespace).List(options)
+	return test.harness.kubeClient.CoreV1().Pods(namespace).List(context.TODO(), options)
 }
 
 // ListPods returns the list of pods in namespace matching options.
@@ -64,7 +65,7 @@ func (test *Test) PodReady(pod v1.Pod) (bool, error) {
 // container to pass its readiness check.
 func (test *Test) WaitForPodsReady(namespace string, opts metav1.ListOptions, expectedReplicas int, timeout time.Duration) error {
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
-		pl, err := test.harness.kubeClient.CoreV1().Pods(namespace).List(opts)
+		pl, err := test.harness.kubeClient.CoreV1().Pods(namespace).List(context.TODO(), opts)
 		if err != nil {
 			return false, err
 		}
@@ -103,7 +104,7 @@ func (test *Test) PodLogs(w io.Writer, pod *v1.Pod, containerName string) error 
 		Namespace(pod.Namespace).
 		Name(pod.Name).SubResource("log").
 		Param("container", containerName).
-		Stream()
+		Stream(context.TODO())
 	if err != nil {
 		return err
 	}
@@ -133,7 +134,7 @@ func (test *Test) PodProxyGet(pod *v1.Pod, port, path string) *rest.Request {
 }
 
 func (test *Test) podProxyGetJSON(pod *v1.Pod, port, path string, v interface{}) error {
-	data, err := test.PodProxyGet(pod, port, path).DoRaw()
+	data, err := test.PodProxyGet(pod, port, path).DoRaw(context.TODO())
 	if err != nil {
 		return err
 	}

@@ -1,12 +1,13 @@
 package harness
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/util/yaml"
@@ -14,7 +15,7 @@ import (
 
 func (test *Test) createSecret(namespace string, secret *v1.Secret) error {
 	secret.Namespace = namespace
-	if _, err := test.harness.kubeClient.CoreV1().Secrets(namespace).Create(secret); err != nil {
+	if _, err := test.harness.kubeClient.CoreV1().Secrets(namespace).Create(context.TODO(), secret, metav1.CreateOptions{}); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("failed to create secret %v ", secret.Name))
 	}
 	return nil
@@ -67,7 +68,7 @@ func (test *Test) CreateSecretFromFile(namespace string, manifestPath string) *v
 }
 
 func (test *Test) deleteSecret(secret *v1.Secret) error {
-	if err := test.harness.kubeClient.CoreV1().Secrets(secret.Namespace).Delete(secret.Name, nil); err != nil {
+	if err := test.harness.kubeClient.CoreV1().Secrets(secret.Namespace).Delete(context.TODO(), secret.Name, metav1.DeleteOptions{}); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("deleting secret %v failed", secret.Name))
 	}
 	return nil
@@ -81,7 +82,7 @@ func (test *Test) DeleteSecret(secret *v1.Secret) {
 
 // GetSecret returns a Secret object if it exists or error.
 func (test *Test) GetSecret(ns, name string) (*v1.Secret, error) {
-	s, err := test.harness.kubeClient.CoreV1().Secrets(ns).Get(name, metav1.GetOptions{})
+	s, err := test.harness.kubeClient.CoreV1().Secrets(ns).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}

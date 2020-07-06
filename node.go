@@ -1,16 +1,17 @@
 package harness
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 func (test *Test) listNodes(options metav1.ListOptions) (*v1.NodeList, error) {
-	return test.harness.kubeClient.CoreV1().Nodes().List(options)
+	return test.harness.kubeClient.CoreV1().Nodes().List(context.TODO(), options)
 }
 
 // ListNodes returns all nodes that are part of the cluster.

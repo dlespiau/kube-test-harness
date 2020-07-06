@@ -1,18 +1,16 @@
 sudo: required
 language: go
 go:
-  - "1.10.3"
+- "1.14.4"
 go_import_path: github.com/dlespiau/kube-test-harness
 
 jobs:
   include:
-      - stage: build & integrations tests
+      - stage: build & unit tests
         script:
-          - make dep
           - make lint
           - make unit-tests
-      - stage:
+      - stage: integration tests
         script:
-          - make dep
           - .ci/setup-minikube v1.9.0
           - make integration-tests
