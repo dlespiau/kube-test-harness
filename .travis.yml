@@ -8,11 +8,9 @@ jobs:
   include:
       - stage: build & unit tests
         script:
-          - make dep
           - make lint
           - make unit-tests
       - stage: integration tests
         script:
-          - make dep
           - .ci/setup-minikube v1.9.0
           - make integration-tests
