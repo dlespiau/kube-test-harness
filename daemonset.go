@@ -43,7 +43,7 @@ func (test *Test) loadDaemonSet(manifestPath string) (*appsv1.DaemonSet, error) 
 }
 
 // LoadDaemonSet loads a daemonset from a YAML manifest. The path to the
-// manifest is relative to Harness.ManifestsDirectory.
+// manifest is relative to Harness.ManifestDirectory.
 func (test *Test) LoadDaemonSet(manifestPath string) *appsv1.DaemonSet {
 	dep, err := test.loadDaemonSet(manifestPath)
 	test.err(err)

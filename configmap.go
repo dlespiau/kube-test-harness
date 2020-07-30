@@ -41,7 +41,7 @@ func (test *Test) loadConfigMap(manifestPath string) (*v1.ConfigMap, error) {
 }
 
 // LoadConfigMap loads a ConfigMap from a YAML manifest. The path to the
-// manifest is relative to Harness.ManifestsDirectory.
+// manifest is relative to Harness.ManifestDirectory.
 func (test *Test) LoadConfigMap(manifestPath string) *v1.ConfigMap {
 	dep, err := test.loadConfigMap(manifestPath)
 	test.err(err)
