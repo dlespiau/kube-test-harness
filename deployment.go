@@ -2,9 +2,9 @@ package harness
 
 import (
 	"context"
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -18,7 +18,7 @@ func (test *Test) createDeployment(namespace string, d *appsv1.Deployment) error
 	d.Namespace = namespace
 	_, err := test.harness.kubeClient.AppsV1().Deployments(namespace).Create(context.TODO(), d, metav1.CreateOptions{})
 	if err != nil {
-		return errors.Wrapf(err, "failed to create deployment %s", d.Name)
+		return fmt.Errorf("failed to create deployment %s: %w", d.Name, err)
 	}
 	return nil
 }
@@ -36,7 +36,7 @@ func (test *Test) loadDeployment(manifestPath string) (*appsv1.Deployment, error
 	}
 	dep := appsv1.Deployment{}
 	if err := yaml.NewYAMLOrJSONDecoder(manifest, 100).Decode(&dep); err != nil {
-		return nil, errors.Wrapf(err, "failed to decode deployment %s", manifestPath)
+		return nil, fmt.Errorf("failed to decode deployment %s: %w", manifestPath, err)
 	}
 
 	return &dep, nil

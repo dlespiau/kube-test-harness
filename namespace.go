@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -18,7 +17,7 @@ func (test *Test) createNamespace(name string) (*v1.Namespace, error) {
 		},
 	}, metav1.CreateOptions{})
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to create namespace with name %v", name))
+		return nil, fmt.Errorf("failed to create namespace with name %v: %w", name, err)
 	}
 	return namespace, nil
 }

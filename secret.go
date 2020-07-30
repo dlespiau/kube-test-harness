@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -16,7 +14,7 @@ import (
 func (test *Test) createSecret(namespace string, secret *v1.Secret) error {
 	secret.Namespace = namespace
 	if _, err := test.harness.kubeClient.CoreV1().Secrets(namespace).Create(context.TODO(), secret, metav1.CreateOptions{}); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("failed to create secret %v ", secret.Name))
+		return fmt.Errorf("failed to create secret %s: %w", secret.Name, err)
 	}
 	return nil
 }
@@ -34,7 +32,7 @@ func (test *Test) loadSecret(manifestPath string) (*v1.Secret, error) {
 	}
 	dep := v1.Secret{}
 	if err := yaml.NewYAMLOrJSONDecoder(manifest, 100).Decode(&dep); err != nil {
-		return nil, errors.Wrapf(err, "failed to decode secret %s", manifestPath)
+		return nil, fmt.Errorf("failed to decode secret %s: %w", manifestPath, err)
 	}
 
 	return &dep, nil
@@ -69,7 +67,7 @@ func (test *Test) CreateSecretFromFile(namespace string, manifestPath string) *v
 
 func (test *Test) deleteSecret(secret *v1.Secret) error {
 	if err := test.harness.kubeClient.CoreV1().Secrets(secret.Namespace).Delete(context.TODO(), secret.Name, metav1.DeleteOptions{}); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("deleting secret %v failed", secret.Name))
+		return fmt.Errorf("deleting secret %s failed: %w", secret.Name, err)
 	}
 	return nil
 }

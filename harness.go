@@ -1,13 +1,13 @@
 package harness
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/dlespiau/kube-test-harness/logger"
 	"github.com/dlespiau/kube-test-harness/testing"
 
-	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -76,7 +76,7 @@ func resolveDirectory(in string) (string, error) {
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		return "", errors.Wrap(err, "harness")
+		return "", fmt.Errorf("failed to get working directory: %w", err)
 	}
 
 	if in == "" {
@@ -166,7 +166,7 @@ func (h *Harness) openManifest(manifest string) (*os.File, error) {
 	path := filepath.Join(h.options.ManifestDirectory, manifest)
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, errors.Wrap(err, "open manifest")
+		return nil, fmt.Errorf("failed to open manifest: %w", err)
 	}
 
 	return f, nil
