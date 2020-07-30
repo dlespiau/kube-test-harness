@@ -2,9 +2,9 @@ package harness
 
 import (
 	"context"
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -18,7 +18,7 @@ func (test *Test) createDaemonSet(namespace string, d *appsv1.DaemonSet) error {
 	d.Namespace = namespace
 	_, err := test.harness.kubeClient.AppsV1().DaemonSets(namespace).Create(context.TODO(), d, metav1.CreateOptions{})
 	if err != nil {
-		return errors.Wrapf(err, "failed to create daemonset %s", d.Name)
+		return fmt.Errorf("failed to create daemonset %s: %w", d.Name, err)
 	}
 	return nil
 }
@@ -36,7 +36,7 @@ func (test *Test) loadDaemonSet(manifestPath string) (*appsv1.DaemonSet, error) 
 	}
 	dep := appsv1.DaemonSet{}
 	if err := yaml.NewYAMLOrJSONDecoder(manifest, 100).Decode(&dep); err != nil {
-		return nil, errors.Wrapf(err, "failed to decode daemonset %s", manifestPath)
+		return nil, fmt.Errorf("failed to decode daemonset %s: %w", manifestPath, err)
 	}
 
 	return &dep, nil

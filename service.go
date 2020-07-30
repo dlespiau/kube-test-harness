@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -15,7 +14,7 @@ import (
 func (test *Test) createService(namespace string, service *v1.Service) error {
 	service.Namespace = namespace
 	if _, err := test.harness.kubeClient.CoreV1().Services(namespace).Create(context.TODO(), service, metav1.CreateOptions{}); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("failed to create service %v ", service.Name))
+		return fmt.Errorf("failed to create service %s: %w", service.Name, err)
 	}
 	return nil
 }
@@ -33,7 +32,7 @@ func (test *Test) loadService(manifestPath string) (*v1.Service, error) {
 	}
 	dep := v1.Service{}
 	if err := yaml.NewYAMLOrJSONDecoder(manifest, 100).Decode(&dep); err != nil {
-		return nil, errors.Wrapf(err, "failed to decode service %s", manifestPath)
+		return nil, fmt.Errorf("failed to decode service %s: %w", manifestPath, err)
 	}
 
 	return &dep, nil
@@ -88,7 +87,7 @@ func (test *Test) WaitForServiceReady(service *v1.Service) {
 
 func (test *Test) deleteService(service *v1.Service) error {
 	if err := test.harness.kubeClient.CoreV1().Services(service.Namespace).Delete(context.TODO(), service.Name, metav1.DeleteOptions{}); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("deleting service %v failed", service.Name))
+		return fmt.Errorf("deleting service %v failed: %w", service.Name, err)
 	}
 	return nil
 }
@@ -110,7 +109,7 @@ func (test *Test) waitForServiceDeleted(service *v1.Service) error {
 		return false, nil
 	})
 	if err != nil {
-		return errors.Wrap(err, "waiting for service to go away failed")
+		return fmt.Errorf("waiting for service to go away failed: %w", err)
 	}
 
 	return nil
@@ -124,7 +123,7 @@ func (test *Test) WaitForServiceDeleted(service *v1.Service) {
 func (test *Test) getEndpoints(namespace, serviceName string) (*v1.Endpoints, error) {
 	endpoints, err := test.harness.kubeClient.CoreV1().Endpoints(namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to request endpoints for service %v", serviceName))
+		return nil, fmt.Errorf("failed to request endpoints for service %s: %w", serviceName, err)
 	}
 	return endpoints, nil
 }

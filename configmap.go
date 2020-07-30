@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -16,7 +14,7 @@ import (
 func (test *Test) createConfigMap(namespace string, cm *v1.ConfigMap) error {
 	cm.Namespace = namespace
 	if _, err := test.harness.kubeClient.CoreV1().ConfigMaps(namespace).Create(context.TODO(), cm, metav1.CreateOptions{}); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("failed to create ConfigMap %v ", cm.Name))
+		return fmt.Errorf("failed to create ConfigMap %s: %w", cm.Name, err)
 	}
 	return nil
 }
@@ -34,7 +32,7 @@ func (test *Test) loadConfigMap(manifestPath string) (*v1.ConfigMap, error) {
 	}
 	dep := v1.ConfigMap{}
 	if err := yaml.NewYAMLOrJSONDecoder(manifest, 100).Decode(&dep); err != nil {
-		return nil, errors.Wrapf(err, "failed to decode ConfigMap %s", manifestPath)
+		return nil, fmt.Errorf("failed to decode ConfigMap %s: %w", manifestPath, err)
 	}
 
 	return &dep, nil
@@ -69,7 +67,7 @@ func (test *Test) CreateConfigMapFromFile(namespace string, manifestPath string)
 
 func (test *Test) deleteConfigMap(ConfigMap *v1.ConfigMap) error {
 	if err := test.harness.kubeClient.CoreV1().ConfigMaps(ConfigMap.Namespace).Delete(context.TODO(), ConfigMap.Name, metav1.DeleteOptions{}); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("deleting ConfigMap %v failed", ConfigMap.Name))
+		return fmt.Errorf("deleting ConfigMap %s failed: %w", ConfigMap.Name, err)
 	}
 	return nil
 }
