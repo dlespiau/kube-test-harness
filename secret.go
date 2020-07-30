@@ -41,7 +41,7 @@ func (test *Test) loadSecret(manifestPath string) (*v1.Secret, error) {
 }
 
 // LoadSecret loads a secret from a YAML manifest. The path to the
-// manifest is relative to Harness.ManifestsDirectory.
+// manifest is relative to Harness.ManifestDirectory.
 func (test *Test) LoadSecret(manifestPath string) *v1.Secret {
 	dep, err := test.loadSecret(manifestPath)
 	test.err(err)

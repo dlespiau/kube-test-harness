@@ -40,7 +40,7 @@ func (test *Test) loadService(manifestPath string) (*v1.Service, error) {
 }
 
 // LoadService loads a service from a YAML manifest. The path to the
-// manifest is relative to Harness.ManifestsDirectory.
+// manifest is relative to Harness.ManifestDirectory.
 func (test *Test) LoadService(manifestPath string) *v1.Service {
 	dep, err := test.loadService(manifestPath)
 	test.err(err)

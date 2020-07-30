@@ -43,7 +43,7 @@ func (test *Test) loadDeployment(manifestPath string) (*appsv1.Deployment, error
 }
 
 // LoadDeployment loads a deployment from a YAML manifest. The path to the
-// manifest is relative to Harness.ManifestsDirectory.
+// manifest is relative to Harness.ManifestDirectory.
 func (test *Test) LoadDeployment(manifestPath string) *appsv1.Deployment {
 	dep, err := test.loadDeployment(manifestPath)
 	test.err(err)
