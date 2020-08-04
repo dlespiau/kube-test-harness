@@ -25,6 +25,25 @@ func (test *Test) CreateService(namespace string, service *v1.Service) {
 	test.err(err)
 }
 
+func (test *Test) getService(namespace, name string) (*v1.Service, error) {
+	var (
+		service *v1.Service
+		err     error
+	)
+
+	if service, err = test.harness.kubeClient.CoreV1().Services(namespace).Get(context.TODO(), name, metav1.GetOptions{}); err != nil {
+		return nil, fmt.Errorf("failed to get service %s: %w", name, err)
+	}
+	return service, nil
+}
+
+// GetService retrieves a service with a given name and namespace.
+func (test *Test) GetService(namespace, name string) *v1.Service {
+	service, err := test.getService(namespace, name)
+	test.err(err)
+	return service
+}
+
 func (test *Test) loadService(manifestPath string) (*v1.Service, error) {
 	manifest, err := test.harness.openManifest(manifestPath)
 	if err != nil {
