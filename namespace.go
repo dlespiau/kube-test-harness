@@ -45,3 +45,18 @@ func (test *Test) deleteNamespace(name string) error {
 
 	return test.harness.kubeClient.CoreV1().Namespaces().Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
+
+// DeleteNamespace deletes a Namespace.
+func (test *Test) DeleteNamespace(name string) {
+	err := test.deleteNamespace(name)
+	test.err(err)
+}
+
+// GetNamespace returns a Namespace object if it exists or error.
+func (test *Test) GetNamespace(name string) (*v1.Namespace, error) {
+	ns, err := test.harness.kubeClient.CoreV1().Namespaces().Get(context.TODO(), name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return ns, nil
+}

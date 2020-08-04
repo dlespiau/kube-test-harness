@@ -206,14 +206,11 @@ func (t *Test) addNamespace(ns string) {
 }
 
 func (t *Test) removeNamespace(ns string) {
-	new := make([]string, 0, len(t.namespaces)-1)
-	for _, s := range t.namespaces {
+	for i, s := range t.namespaces {
 		if s == ns {
-			continue
+			t.namespaces = append(t.namespaces[:i], t.namespaces[i+1:]...)
 		}
-		new = append(new, s)
 	}
-	t.namespaces = new
 }
 
 func (t *Test) addFinalizer(fn finalizer) {
