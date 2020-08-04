@@ -82,7 +82,7 @@ func (test *Test) WaitForPodsReady(namespace string, opts metav1.ListOptions, ex
 			}
 		}
 
-		if runningAndReady == expectedReplicas {
+		if runningAndReady >= expectedReplicas {
 			return true, nil
 		}
 		return false, nil
