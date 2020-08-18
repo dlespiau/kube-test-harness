@@ -14,7 +14,8 @@ import (
 
 // createDaemonSet creates a daemonset in the given namespace.
 func (test *Test) createDaemonSet(namespace string, d *appsv1.DaemonSet) error {
-	test.Infof("creating daemonset %s", d.Name)
+	test.Debugf("creating daemonset %s", d.Name)
+
 	d.Namespace = namespace
 	_, err := test.harness.kubeClient.AppsV1().DaemonSets(namespace).Create(context.TODO(), d, metav1.CreateOptions{})
 	if err != nil {
@@ -81,8 +82,7 @@ func (test *Test) GetDaemonSet(ns, name string) (*appsv1.DaemonSet, error) {
 
 // waitForDaemonSetReady waits until all replica pods are running and ready.
 func (test *Test) waitForDaemonSetReady(d *appsv1.DaemonSet, timeout time.Duration) error {
-
-	test.Infof("waiting for daemonset %s to be ready", d.Name)
+	test.Debugf("waiting for daemonset %s to be ready", d.Name)
 
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
 		current, err := test.GetDaemonSet(d.Namespace, d.Name)
@@ -106,7 +106,7 @@ func (test *Test) WaitForDaemonSetReady(d *appsv1.DaemonSet, timeout time.Durati
 
 // deleteDaemonSet deletes a daemonset in the given namespace.
 func (test *Test) deleteDaemonSet(d *appsv1.DaemonSet) error {
-	test.Infof("deleting daemonset %s ", d.Name)
+	test.Debugf("deleting daemonset %s ", d.Name)
 
 	d, err := test.GetDaemonSet(d.Namespace, d.Name)
 	if err != nil {
@@ -123,7 +123,7 @@ func (test *Test) DeleteDaemonSet(d *appsv1.DaemonSet) {
 
 // waitForDaemonSetDeleted waits until a deleted daemonset has disappeared from the cluster.
 func (test *Test) waitForDaemonSetDeleted(d *appsv1.DaemonSet, timeout time.Duration) error {
-	test.Infof("waiting for daemonset %s to be deleted", d.Name)
+	test.Debugf("waiting for daemonset %s to be deleted", d.Name)
 
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
 

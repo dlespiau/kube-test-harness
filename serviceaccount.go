@@ -12,6 +12,8 @@ import (
 )
 
 func (test *Test) createServiceAccount(namespace string, serviceAccount *v1.ServiceAccount) error {
+	test.Debugf("creating serviceaccount %s", serviceAccount.Name)
+
 	serviceAccount.Namespace = namespace
 	if _, err := test.harness.kubeClient.CoreV1().ServiceAccounts(namespace).Create(context.TODO(), serviceAccount, metav1.CreateOptions{}); err != nil {
 		return fmt.Errorf("failed to create ServiceAccount %s: %w", serviceAccount.Name, err)
@@ -66,6 +68,8 @@ func (test *Test) CreateServiceAccountFromFile(namespace string, manifestPath st
 }
 
 func (test *Test) deleteServiceAccount(serviceAccount *v1.ServiceAccount) error {
+	test.Debugf("deleting serviceaccount %s ", serviceAccount.Name)
+
 	if err := test.harness.kubeClient.CoreV1().ServiceAccounts(serviceAccount.Namespace).Delete(context.TODO(), serviceAccount.Name, metav1.DeleteOptions{}); err != nil {
 		return fmt.Errorf("deleting ServiceAccount %s failed: %w", serviceAccount.Name, err)
 	}
@@ -84,7 +88,8 @@ func (test *Test) GetServiceAccount(namespace, name string) (*v1.ServiceAccount,
 }
 
 func (test *Test) waitForServiceAccountReady(serviceAccount *v1.ServiceAccount) error {
-	test.Infof("waiting for ServiceAccount %s to be ready", serviceAccount.Name)
+	test.Debugf("waiting for serviceaccount %s to be ready", serviceAccount.Name)
+
 	err := wait.Poll(time.Second, time.Minute*5, func() (bool, error) {
 		_, err := test.GetServiceAccount(serviceAccount.Namespace, serviceAccount.Name)
 		if err != nil {

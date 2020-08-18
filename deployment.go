@@ -14,7 +14,8 @@ import (
 
 // CreateDeployment creates a deployment in the given namespace.
 func (test *Test) createDeployment(namespace string, d *appsv1.Deployment) error {
-	test.Infof("creating deployment %s", d.Name)
+	test.Debugf("creating deployment %s", d.Name)
+
 	d.Namespace = namespace
 	_, err := test.harness.kubeClient.AppsV1().Deployments(namespace).Create(context.TODO(), d, metav1.CreateOptions{})
 	if err != nil {
@@ -81,9 +82,9 @@ func (test *Test) GetDeployment(ns, name string) (*appsv1.Deployment, error) {
 
 // waitForDeploymentReady waits until all replica pods are running and ready.
 func (test *Test) waitForDeploymentReady(d *appsv1.Deployment, timeout time.Duration) error {
-	numReady := int32(0)
+	test.Debugf("waiting for deployment %s to be ready", d.Name)
 
-	test.Infof("waiting for deployment %s to be ready", d.Name)
+	numReady := int32(0)
 
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
 		current, err := test.GetDeployment(d.Namespace, d.Name)
@@ -111,7 +112,7 @@ func (test *Test) WaitForDeploymentReady(d *appsv1.Deployment, timeout time.Dura
 
 // deleteDeployment deletes a deployment in the given namespace.
 func (test *Test) deleteDeployment(d *appsv1.Deployment) error {
-	test.Infof("deleting deployment %s ", d.Name)
+	test.Debugf("deleting deployment %s ", d.Name)
 
 	d, err := test.GetDeployment(d.Namespace, d.Name)
 	if err != nil {
@@ -135,7 +136,7 @@ func (test *Test) DeleteDeployment(d *appsv1.Deployment) {
 
 // waitForDeploymentDeleted waits until a deleted deployment has disappeared from the cluster.
 func (test *Test) waitForDeploymentDeleted(d *appsv1.Deployment, timeout time.Duration) error {
-	test.Infof("waiting for deployment %s to be deleted", d.Name)
+	test.Debugf("waiting for deployment %s to be deleted", d.Name)
 
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
 
