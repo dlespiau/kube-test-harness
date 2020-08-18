@@ -146,3 +146,16 @@ func (test *Test) podProxyGetJSON(pod *v1.Pod, port, path string, v interface{})
 func (test *Test) PodProxyGetJSON(pod *v1.Pod, port, path string, v interface{}) {
 	test.err(test.podProxyGetJSON(pod, port, path, v))
 }
+
+// deletePod deletes a pod in the given namespace.
+func (test *Test) deletePod(pod *v1.Pod) error {
+	if err := test.harness.kubeClient.CoreV1().Pods(pod.Namespace).Delete(context.TODO(), pod.Name, metav1.DeleteOptions{}); err != nil {
+		return fmt.Errorf("deleting pod %v failed: %w", pod.Name, err)
+	}
+	return nil
+}
+
+// DeletePod deletes a pod in the given namespace.
+func (test *Test) DeletePod(pod *v1.Pod) {
+	test.err(test.deletePod(pod))
+}
