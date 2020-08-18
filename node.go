@@ -47,9 +47,9 @@ func (test *Test) NodeReady(node *v1.Node) bool {
 
 // waitForDeploymentReady waits until all replica pods are running and ready.
 func (test *Test) waitForNodesReady(expectedNodes int, timeout time.Duration) error {
-	numReady := 0
+	test.Debugf("waiting for %d nodes to be ready", expectedNodes)
 
-	test.Infof("waiting for %d nodes to be ready", expectedNodes)
+	numReady := 0
 
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
 		current, err := test.listNodes(metav1.ListOptions{})

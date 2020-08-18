@@ -12,6 +12,8 @@ import (
 )
 
 func (test *Test) createConfigMap(namespace string, cm *v1.ConfigMap) error {
+	test.Debugf("creating configmap %s", cm.Name)
+
 	cm.Namespace = namespace
 	if _, err := test.harness.kubeClient.CoreV1().ConfigMaps(namespace).Create(context.TODO(), cm, metav1.CreateOptions{}); err != nil {
 		return fmt.Errorf("failed to create ConfigMap %s: %w", cm.Name, err)
@@ -65,9 +67,11 @@ func (test *Test) CreateConfigMapFromFile(namespace string, manifestPath string)
 	return d
 }
 
-func (test *Test) deleteConfigMap(ConfigMap *v1.ConfigMap) error {
-	if err := test.harness.kubeClient.CoreV1().ConfigMaps(ConfigMap.Namespace).Delete(context.TODO(), ConfigMap.Name, metav1.DeleteOptions{}); err != nil {
-		return fmt.Errorf("deleting ConfigMap %s failed: %w", ConfigMap.Name, err)
+func (test *Test) deleteConfigMap(cm *v1.ConfigMap) error {
+	test.Debugf("deleting configmap %s", cm.Name)
+
+	if err := test.harness.kubeClient.CoreV1().ConfigMaps(cm.Namespace).Delete(context.TODO(), cm.Name, metav1.DeleteOptions{}); err != nil {
+		return fmt.Errorf("deleting ConfigMap %s failed: %w", cm.Name, err)
 	}
 	return nil
 }
@@ -95,6 +99,8 @@ func (test *Test) WaitForConfigMapReady(cm *v1.ConfigMap, timeout time.Duration)
 }
 
 func (test *Test) waitForConfigMapReady(ns, name string, timeout time.Duration) error {
+	test.Debugf("waiting for configmap %s to be ready", name)
+
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
 		_, err := test.GetConfigMap(ns, name)
 		if err != nil {

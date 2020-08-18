@@ -9,7 +9,7 @@ import (
 )
 
 func (test *Test) createNamespace(name string) (*v1.Namespace, error) {
-	test.Infof("creating namespace %s", name)
+	test.Debugf("creating namespace %s", name)
 
 	namespace, err := test.harness.kubeClient.CoreV1().Namespaces().Create(context.TODO(), &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
@@ -24,7 +24,6 @@ func (test *Test) createNamespace(name string) (*v1.Namespace, error) {
 
 // CreateNamespace creates a new namespace.
 func (test *Test) CreateNamespace(name string) {
-
 	_, err := test.createNamespace(name)
 	test.err(err)
 
@@ -39,7 +38,7 @@ func (test *Test) CreateNamespace(name string) {
 }
 
 func (test *Test) deleteNamespace(name string) error {
-	test.Infof("deleting namespace %s", name)
+	test.Debugf("deleting namespace %s", name)
 
 	test.removeNamespace(name)
 

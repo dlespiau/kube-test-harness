@@ -12,6 +12,8 @@ import (
 )
 
 func (test *Test) createService(namespace string, service *v1.Service) error {
+	test.Debugf("creating service %s", service.Name)
+
 	service.Namespace = namespace
 	if _, err := test.harness.kubeClient.CoreV1().Services(namespace).Create(context.TODO(), service, metav1.CreateOptions{}); err != nil {
 		return fmt.Errorf("failed to create service %s: %w", service.Name, err)
@@ -85,7 +87,8 @@ func (test *Test) CreateServiceFromFile(namespace string, manifestPath string) *
 }
 
 func (test *Test) waitForServiceReady(service *v1.Service) error {
-	test.Infof("waiting for service %s to be ready", service.Name)
+	test.Debugf("waiting for service %s to be ready", service.Name)
+
 	err := wait.Poll(time.Second, time.Minute*5, func() (bool, error) {
 		endpoints, err := test.getEndpoints(service.Namespace, service.Name)
 		if err != nil {
@@ -105,6 +108,8 @@ func (test *Test) WaitForServiceReady(service *v1.Service) {
 }
 
 func (test *Test) deleteService(service *v1.Service) error {
+	test.Debugf("deleting service %s", service.Name)
+
 	if err := test.harness.kubeClient.CoreV1().Services(service.Namespace).Delete(context.TODO(), service.Name, metav1.DeleteOptions{}); err != nil {
 		return fmt.Errorf("deleting service %v failed: %w", service.Name, err)
 	}
@@ -118,7 +123,7 @@ func (test *Test) DeleteService(service *v1.Service) {
 }
 
 func (test *Test) waitForServiceDeleted(service *v1.Service) error {
-	test.Infof("waiting for service %s to be deleted", service.Name)
+	test.Debugf("waiting for service %s to be deleted", service.Name)
 
 	err := wait.Poll(5*time.Second, time.Minute, func() (bool, error) {
 		_, err := test.getEndpoints(service.Namespace, service.Name)

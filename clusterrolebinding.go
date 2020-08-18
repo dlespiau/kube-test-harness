@@ -12,6 +12,8 @@ import (
 )
 
 func (test *Test) createClusterRoleBinding(crb *rbacv1.ClusterRoleBinding) error {
+	test.Debugf("creating cluster role binding %s", crb.Name)
+
 	if _, err := test.harness.kubeClient.RbacV1().ClusterRoleBindings().Create(context.TODO(), crb, metav1.CreateOptions{}); err != nil {
 		return fmt.Errorf("failed to create cluster role binding %s: %w", crb.Name, err)
 	}
@@ -64,6 +66,8 @@ func (test *Test) CreateClusterRoleBindingFromFile(manifestPath string) *rbacv1.
 }
 
 func (test *Test) deleteClusterRoleBinding(crb *rbacv1.ClusterRoleBinding) error {
+	test.Debugf("deleting cluster role binding %s", crb.Name)
+
 	if err := test.harness.kubeClient.RbacV1().ClusterRoleBindings().Delete(context.TODO(), crb.Name, metav1.DeleteOptions{}); err != nil {
 		return fmt.Errorf("deleting cluster role binding %s failed: %w", crb.Name, err)
 	}
@@ -86,6 +90,8 @@ func (test *Test) GetClusterRoleBinding(name string) (*rbacv1.ClusterRoleBinding
 }
 
 func (test *Test) waitForClusterRoleBindingReady(name string, timeout time.Duration) error {
+	test.Debugf("waiting for cluster role binding %s to be ready", name)
+
 	return wait.Poll(time.Second, timeout, func() (bool, error) {
 		_, err := test.GetClusterRoleBinding(name)
 		if err != nil {
