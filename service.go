@@ -107,6 +107,21 @@ func (test *Test) WaitForServiceReady(service *v1.Service) {
 	test.err(test.waitForServiceReady(service))
 }
 
+func (test *Test) updateService(service *v1.Service) error {
+	test.Debugf("updating service %s", service.Name)
+
+	if _, err := test.harness.kubeClient.CoreV1().Services(service.Namespace).Update(context.TODO(), service, metav1.UpdateOptions{}); err != nil {
+		return fmt.Errorf("updating service %v failed: %w", service.Name, err)
+	}
+	return nil
+}
+
+// UpdateService updates a service.
+func (test *Test) UpdateService(service *v1.Service) {
+	err := test.updateService(service)
+	test.err(err)
+}
+
 func (test *Test) deleteService(service *v1.Service) error {
 	test.Debugf("deleting service %s", service.Name)
 
