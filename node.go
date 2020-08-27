@@ -45,8 +45,7 @@ func (test *Test) NodeReady(node *v1.Node) bool {
 	return ready
 }
 
-// waitForDeploymentReady waits until all replica pods are running and ready.
-func (test *Test) waitForNodesReady(expectedNodes int, timeout time.Duration) error {
+func (test *Test) waitForNodesReady(expectedNodes int, exact bool, timeout time.Duration) error {
 	test.Debugf("waiting for %d nodes to be ready", expectedNodes)
 
 	numReady := 0
@@ -74,17 +73,25 @@ func (test *Test) waitForNodesReady(expectedNodes int, timeout time.Duration) er
 			numReady = currentNumReady
 			test.Debugf("nodes ready: %d/%d", numReady, expectedNodes)
 		}
-		if currentNumReady == expectedNodes {
-			return true, nil
-		}
 
-		return false, nil
+		if exact {
+			return currentNumReady == expectedNodes, nil
+		} else {
+			return currentNumReady >= expectedNodes, nil
+		}
 	})
 }
 
 // WaitForNodesReady waits until the specified number of nodes are running and
 // ready. The function waits until the exact number is of expected node is matched.
 func (test *Test) WaitForNodesReady(expectedNodes int, timeout time.Duration) {
-	err := test.waitForNodesReady(expectedNodes, timeout)
+	err := test.waitForNodesReady(expectedNodes, true, timeout)
+	test.err(err)
+}
+
+// WaitForNodesReadyMin waits until the specified minimum number of nodes are running and
+// ready. The function waits until the exact number is of expected node is matched.
+func (test *Test) WaitForNodesReadyMin(minExpectedNodes int, timeout time.Duration) {
+	err := test.waitForNodesReady(minExpectedNodes, false, timeout)
 	test.err(err)
 }
