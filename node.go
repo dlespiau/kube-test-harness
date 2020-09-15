@@ -76,9 +76,8 @@ func (test *Test) waitForNodesReady(expectedNodes int, exact bool, timeout time.
 
 		if exact {
 			return currentNumReady == expectedNodes, nil
-		} else {
-			return currentNumReady >= expectedNodes, nil
 		}
+		return currentNumReady >= expectedNodes, nil
 	})
 }
 
